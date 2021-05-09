@@ -16,27 +16,10 @@ class BoardBuilder {
     class PlayerBuilder internal constructor(private val player: Player) {
         internal var data = mutableMapOf<Position, PieceState>()
 
-        fun pawn(file: File, rank: Int) =
-            add(pawn, file, rank)
-
-        fun rook(file: File, rank: Int) =
-            add(rook, file, rank)
-
-        fun knight(file: File, rank: Int) =
-            add(knight, file, rank)
-
-        fun bishop(file: File, rank: Int) =
-            add(bishop, file, rank)
-
-        fun queen(file: File, rank: Int) =
-            add(queen, file, rank)
-
-        fun king(file: File, rank: Int) =
-            add(king, file, rank)
-
-        private fun add(piece: Piece, file: File, rank: Int) {
-            data[Position(file, rank.toRank())] = PieceState(piece, player)
+        infix fun Piece.on(shorthand: ShorthandPosition) {
+            data[shorthand.position] = PieceState(this, player)
         }
+
     }
 
     fun white(block: PlayerBuilder.() -> Unit) {

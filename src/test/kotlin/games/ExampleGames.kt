@@ -8,6 +8,7 @@ import domain.BoardBuilder.Companion.board
 import domain.File.*
 import domain.Piece.*
 import domain.Rank.*
+import domain.ShorthandPosition.*
 
 object ExampleGames {
     data class ExampleGame(
@@ -108,19 +109,19 @@ object ExampleGames {
             ).map { Move(it.first) to it.second },
             board {
                 white {
-                    queen(a, 7)
-                    king(c, 1)
-                    pawn(f, 4)
-                    pawn(g, 3)
-                    pawn(h, 2)
+                    queen on a7
+                    king on c1
+                    pawn on f4
+                    pawn on g3
+                    pawn on h2
                 }
                 black {
-                    pawn(h, 7)
-                    pawn(g, 6)
-                    pawn(f, 5)
-                    pawn(c, 3)
-                    rook(d, 2)
-                    king(e, 1)
+                    pawn on h7
+                    pawn on g6
+                    pawn on f5
+                    pawn on c3
+                    rook on d2
+                    king on e1
                 }
             }
     )
@@ -129,22 +130,22 @@ object ExampleGames {
         .toExampleGame(
             board {
                 white {
-                    rook(h, 7)
-                    knight(g, 5)
-                    queen(d, 5)
-                    pawn(a, 3)
-                    pawn(b, 3)
-                    pawn(g, 3)
-                    pawn(h, 3)
-                    king(h, 2)
+                    rook on h7
+                    knight on g5
+                    queen on d5
+                    pawn on a3
+                    pawn on b3
+                    pawn on g3
+                    pawn on h3
+                    king on h2
                 }
                 black {
-                    king(h, 6)
-                    queen(f, 6)
-                    pawn(d, 4)
-                    pawn(f, 3)
-                    knight(f, 2)
-                    rook(e, 1)
+                    king on h6
+                    queen on f6
+                    pawn on d4
+                    pawn on f3
+                    knight on f2
+                    rook on e1
                 }
             }
         )
@@ -153,16 +154,16 @@ object ExampleGames {
         .toExampleGame(
             board {
                 white {
-                    bishop(b, 5)
-                    pawn(f, 4)
-                    pawn(g, 3)
-                    pawn(h, 4)
-                    king(f, 1)
+                    bishop on b5
+                    pawn on f4
+                    pawn on g3
+                    pawn on h4
+                    king on f1
                 }
                 black {
-                    king(c, 7)
-                    pawn(d, 4)
-                    bishop(e, 3)
+                    king on c7
+                    pawn on d4
+                    bishop on e3
                 }
             }
         )
@@ -171,19 +172,19 @@ object ExampleGames {
         .toExampleGame(
             board {
                 white {
-                    pawn(g, 7)
-                    pawn(g, 3)
-                    knight(f, 4)
-                    king(b, 1)
-                    rook(e, 3)
+                    pawn on g7
+                    pawn on g3
+                    knight on f4
+                    king on b1
+                    rook on e3
                 }
                 black {
-                    pawn(a, 7)
-                    pawn(b, 7)
-                    king(b, 4)
-                    knight(b, 3)
-                    pawn(c, 4)
-                    rook(d, 2)
+                    pawn on a7
+                    pawn on b7
+                    king on b4
+                    knight on b3
+                    pawn on c4
+                    rook on d2
                 }
             }
         )
