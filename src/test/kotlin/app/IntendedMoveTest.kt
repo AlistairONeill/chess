@@ -9,15 +9,19 @@ import org.junit.jupiter.api.Test
 class IntendedMoveTest {
 
     @Test
-    fun `Can parse Kasparov vs Topalov`() {
-        ExampleGames.KasparovTopalov.forEach { (notation, intention) ->
-            assertThat(
-                "Failed to parse: [$notation]",
-                Move(notation).parse(),
-                equalTo(
-                    intention
-                )
-            )
+    fun `Can parse moves in Example Games`() {
+        ExampleGames.allExampleGames.forEach { game ->
+            game.moves.forEach { (move, intention) ->
+                if (intention != null) {
+                    assertThat(
+                        "Failed to parse: [${move.notation}]",
+                        move.parse(),
+                        equalTo(
+                            intention
+                        )
+                    )
+                }
+            }
         }
     }
 }
