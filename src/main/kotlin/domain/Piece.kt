@@ -11,7 +11,5 @@ enum class Piece {
 
 data class PieceState(
     val piece: Piece,
-    val player: Player,
-    val justMoved: Boolean = false,
-    val hasMoved: Boolean = false
+    val player: Player
 )

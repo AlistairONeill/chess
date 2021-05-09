@@ -1,5 +1,6 @@
 package domain
 
+import domain.Player.Black
 import domain.Player.White
 import java.time.Duration
 import java.time.Instant
@@ -12,7 +13,7 @@ data class GameState(
 ) {
     data class Flags(
         val toMove: Player,
-        val justAdvancedPawn: Boolean,
+        val pawnCharge: Position?,
         val white: PlayerFlags,
         val black: PlayerFlags
     ) {
@@ -33,10 +34,15 @@ data class GameState(
         companion object {
             fun mint() = Flags(
                 toMove = White,
-                justAdvancedPawn = false,
+                null,
                 white = PlayerFlags.mint(),
                 black = PlayerFlags.mint()
             )
+        }
+
+        val currentPlayerFlags = when(toMove) {
+            White -> white
+            Black -> black
         }
     }
 
@@ -53,4 +59,6 @@ data class GameState(
 
     //TODO: REMOVE
     val toMove = flags.toMove
+
+    val currentPlayerFlags = flags.currentPlayerFlags
 }

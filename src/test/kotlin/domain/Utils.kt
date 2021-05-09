@@ -16,26 +16,26 @@ class BoardBuilder {
     class PlayerBuilder internal constructor(private val player: Player) {
         internal var data = mutableMapOf<Position, PieceState>()
 
-        fun pawn(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(Pawn, file, rank, justMoved, hasMoved)
+        fun pawn(file: File, rank: Rank) =
+            add(Pawn, file, rank)
 
-        fun rook(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(Rook, file, rank, justMoved, hasMoved)
+        fun rook(file: File, rank: Rank) =
+            add(Rook, file, rank)
 
-        fun knight(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(Knight, file, rank, justMoved, hasMoved)
+        fun knight(file: File, rank: Rank) =
+            add(Knight, file, rank)
 
-        fun bishop(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(Bishop, file, rank, justMoved, hasMoved)
+        fun bishop(file: File, rank: Rank) =
+            add(Bishop, file, rank)
 
-        fun queen(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(Queen, file, rank, justMoved, hasMoved)
+        fun queen(file: File, rank: Rank) =
+            add(Queen, file, rank)
 
-        fun king(file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) =
-            add(King, file, rank, justMoved, hasMoved)
+        fun king(file: File, rank: Rank) =
+            add(King, file, rank)
 
-        private fun add(piece: Piece, file: File, rank: Rank, justMoved: Boolean = false, hasMoved: Boolean = false) {
-            data[Position(file, rank)] = PieceState(piece, player, justMoved, hasMoved)
+        private fun add(piece: Piece, file: File, rank: Rank) {
+            data[Position(file, rank)] = PieceState(piece, player)
         }
     }
 

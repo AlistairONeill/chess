@@ -15,30 +15,33 @@ class Engine(
         fun applyMove(gameState: GameState, stampedMove: StampedMove) =
             Engine(gameState, stampedMove).run()
     }
+
     fun run(): GameState {
         val newClock = gameState.clock.reduce(
             gameState.toMove,
             Duration.between(gameState.lastMove, stampedMove.stamp)
         )
         val intention = stampedMove.move.parse()
-        val newBoard = when(val intendedMove = intention.move) {
+        val outcome = when(val intendedMove = intention.move) {
             is KingSideCastle -> applyKingSideCastle()
             is QueensSideCastle -> applyQueenSideCastle()
             is SimpleIntendedMove -> applySimpleIntendedMove(intendedMove)
             is PawnPromotion -> applyPawnPromotion(intendedMove)
         }
 
+        val newBoard = gameState.board.applyOutcome(outcome)
+
         if (CheckFinder.isInDirectCheck(newBoard, gameState.toMove)) {
             throw InCheckException
         }
+
+        val newFlags = gameState.flags.applyOutcome(outcome)
 
         return GameState(
             board = newBoard,
             clock = newClock,
             lastMove = stampedMove.stamp,
-            flags = gameState.flags.copy(
-                toMove = gameState.toMove.other()
-            )
+            flags = newFlags
         )
     }
 
@@ -49,47 +52,27 @@ class Engine(
 
     private fun isInCheck(file: File) = CheckFinder.isInCheck(gameState.board, Position(file, backRank), gameState.toMove.other())
 
-    private fun assertKingHasNotMoved() {
-        val pieceState = gameState.board[Position(E, backRank)]
-        if (pieceState == null || pieceState.hasMoved || pieceState.piece != King || pieceState.player != gameState.toMove) throw InvalidCastleException("Your king has moved")
-    }
-
-    private fun assertRookHasNotMoved(file: File) {
-        val pieceState = gameState.board[Position(file, backRank)]
-        if (pieceState == null || pieceState.hasMoved || pieceState.piece != Rook || pieceState.player != gameState.toMove) throw InvalidCastleException("Your rook has moved")
-    }
-
     private fun isEmpty(file: File) = gameState.board[Position(file, backRank)] == null
 
-    private fun applyKingSideCastle(): Board {
-        assertKingHasNotMoved()
-        assertRookHasNotMoved(H)
+    private fun applyKingSideCastle(): Outcome {
+        if (gameState.currentPlayerFlags.kingMoved) throw InvalidCastleException("Your king has moved")
+        if (gameState.currentPlayerFlags.kingSideRookMoved) throw InvalidCastleException("Your rook has moved")
         if (isInCheck(E)) throw InvalidCastleException("You cannot castle out of check")
         if (isInCheck(F) || isInCheck(G)) throw InvalidCastleException("You cannot castle through check")
         if (!isEmpty(F) || !isEmpty(G)) throw InvalidCastleException("There is a piece in the way")
-        return gameState.board
-            .refresh()
-            .remove(Position(E, backRank))
-            .remove(Position(H, backRank))
-            .add(King, Position(G, backRank))
-            .add(Rook, Position(F, backRank))
+        return KingSideCastleOutcome(gameState.toMove)
     }
 
-    private fun applyQueenSideCastle(): Board {
-        assertKingHasNotMoved()
-        assertRookHasNotMoved(A)
+    private fun applyQueenSideCastle(): Outcome {
+        if (gameState.currentPlayerFlags.kingMoved) throw InvalidCastleException("Your king has moved")
+        if (gameState.currentPlayerFlags.queenSideRookMoved) throw InvalidCastleException("Your rook has moved")
         if (isInCheck(E)) throw InvalidCastleException("You cannot castle out of check")
         if (isInCheck(D) || isInCheck(C)) throw InvalidCastleException("You cannot castle through check")
         if (!isEmpty(D) || !isEmpty(C) || !isEmpty(B)) throw InvalidCastleException("There is a piece in the way")
-        return gameState.board
-            .refresh()
-            .remove(Position(E, backRank))
-            .remove(Position(A, backRank))
-            .add(King, Position(C, backRank))
-            .add(Rook, Position(D, backRank))
+        return QueenSideCastleOutcome(gameState.toMove)
     }
 
-    private fun applySimpleIntendedMove(intendedMove: SimpleIntendedMove) : Board {
+    private fun applySimpleIntendedMove(intendedMove: SimpleIntendedMove) : Outcome {
         val targetPieceState = gameState.board[intendedMove.destination]
 
         if (intendedMove.capture) {
@@ -101,7 +84,6 @@ class Engine(
         else {
             if (targetPieceState != null) throw ActuallyACaptureException
         }
-
 
         val possibleOrigins = if (intendedMove.piece == Pawn) {
             if (intendedMove.capture) {
@@ -167,17 +149,14 @@ class Engine(
                 }
             }
         }
-
-        return gameState.board
-            .refresh()
-            .remove(origin)
-            .add(intendedMove.piece, intendedMove.destination)
+        return SimpleMove(intendedMove.piece, origin, intendedMove.destination, gameState.toMove)
     }
 
-    private fun attemptEnPassantResolution(intendedMove: SimpleIntendedMove): Board? {
+    private fun attemptEnPassantResolution(intendedMove: SimpleIntendedMove): Outcome? {
         if (intendedMove.piece != Pawn) return null
         if (!intendedMove.capture) return null
         if (intendedMove.disambiguationRank != null) throw UnnecessaryDisambiguationException
+        if (gameState.flags.pawnCharge == null) return null
 
         val expectedRank = when(gameState.toMove) {
             White -> SIX
@@ -187,12 +166,14 @@ class Engine(
         if (intendedMove.destination.rank != expectedRank) return null
         if (intendedMove.disambiguationFile == null) throw AmbiguityException(Pawn)
 
+        val originRank = when(gameState.toMove) {
+            White -> FIVE
+            Black -> FOUR
+        }
+
         val originPosition = Position(
             intendedMove.disambiguationFile,
-            when(gameState.toMove) {
-                White -> FIVE
-                Black -> FOUR
-            }
+            originRank
         )
 
         val originState = gameState.board[originPosition] ?: return null
@@ -202,23 +183,17 @@ class Engine(
 
         val victimPosition = Position(
             intendedMove.destination.file,
-            when(gameState.toMove) {
-                White -> FIVE
-                Black -> FOUR
-            }
+            originRank
         )
 
-        val victimState = gameState.board[victimPosition] ?: return null
+        if (victimPosition != gameState.flags.pawnCharge) return null
 
+
+        val victimState = gameState.board[victimPosition] ?: return null
         if (victimState.piece != Pawn) return null
-        if (!victimState.justMoved) return null
         if (victimState.player == gameState.toMove) return null
 
-        return gameState.board
-            .refresh()
-            .remove(victimPosition)
-            .remove(originPosition)
-            .add(Pawn, intendedMove.destination)
+        return EnPassantOutcome(originPosition, victimPosition, intendedMove.destination)
     }
 
     private val opponentsBackRank = when(gameState.toMove) {
@@ -226,7 +201,7 @@ class Engine(
         Black -> ONE
     }
 
-    private fun applyPawnPromotion(intendedMove: PawnPromotion) : Board {
+    private fun applyPawnPromotion(intendedMove: PawnPromotion) : Outcome {
         if (intendedMove.destination.rank != opponentsBackRank) throw PromotingNotOnBackRank
         if (intendedMove.disambiguationRank != null) throw UnnecessaryDisambiguationException
         if (intendedMove.newPiece == Pawn || intendedMove.newPiece == King) throw CannotPromoteToException(intendedMove.newPiece)
@@ -274,21 +249,8 @@ class Engine(
             }
         }
 
-        return gameState.board
-            .refresh()
-            .remove(origin)
-            .add(intendedMove.newPiece, intendedMove.destination)
+        return PawnPromotionOutcome(intendedMove.newPiece, origin, intendedMove.destination)
     }
-
-    private fun Board.refresh() = Board(
-        squares.map { line ->
-            line.map {
-                it?.copy(
-                    justMoved = false
-                )
-            }
-        }
-    )
 
     private fun Board.remove(position: Position) = Board(
         squares.mapIndexed { rank, line ->
@@ -304,9 +266,7 @@ class Engine(
                 if (position.rank.index == rank && position.file.index == file) {
                     PieceState(
                         piece,
-                        gameState.toMove,
-                        justMoved = true,
-                        hasMoved = true
+                        gameState.toMove
                     )
                 }
                 else {
@@ -315,6 +275,133 @@ class Engine(
             }
         }
     )
+
+    private fun Board.applyOutcome(outcome: Outcome): Board {
+        var current = this
+        outcome.toRemove.forEach {
+            current = current.remove(it)
+        }
+        outcome.toAdd.forEach { (position, piece) ->
+            current = current.add(piece, position)
+        }
+        return current
+    }
+
+    private fun GameState.Flags.applyOutcome(outcome: Outcome): GameState.Flags {
+        val newCurrentPlayerFlags = currentPlayerFlags.run {
+            copy(
+                kingMoved = kingMoved || outcome.kingMoved,
+                kingSideRookMoved = kingSideRookMoved || outcome.kingRookMoved,
+                queenSideRookMoved = queenSideRookMoved || outcome.queenRookMoved
+            )
+        }
+
+        return when (toMove) {
+            White -> copy(
+                toMove = Black,
+                pawnCharge = outcome.pawnCharge,
+                white = newCurrentPlayerFlags
+            )
+            Black -> copy(
+                toMove = White,
+                pawnCharge = outcome.pawnCharge,
+                black = newCurrentPlayerFlags
+            )
+        }
+    }
+}
+
+sealed class Outcome {
+    abstract val toRemove: List<Position>
+    abstract val toAdd: Map<Position, Piece>
+    abstract val pawnCharge: Position?
+    abstract val kingMoved: Boolean
+    abstract val kingRookMoved: Boolean
+    abstract val queenRookMoved: Boolean
+}
+
+class SimpleMove(piece: Piece, origin: Position, destination: Position, player: Player): Outcome() {
+    override val toRemove = listOf(origin)
+    override val toAdd = mapOf(destination to piece)
+    override val pawnCharge = destination.takeIf {
+        piece == Pawn
+                && (origin.file == destination.file)
+                && ((origin.rank == TWO && destination.rank == FOUR)
+                || (origin.rank == SEVEN && destination.rank == FIVE))
+    }
+    override val kingMoved = piece == King
+    override val kingRookMoved = (piece == Rook
+            && origin == when(player) {
+                White -> Position(H, ONE)
+                Black -> Position(H, EIGHT)
+            })
+    override val queenRookMoved = (piece == Rook
+            && origin == when(player) {
+                White -> Position(A, ONE)
+                Black -> Position(A, EIGHT)
+            })
+}
+
+class KingSideCastleOutcome(player: Player): Outcome() {
+    private val backRank = when (player) {
+        White -> ONE
+        Black -> EIGHT
+    }
+
+    override val toRemove = listOf(
+        Position(E, backRank),
+        Position(H, backRank)
+    )
+
+    override val toAdd = mapOf(
+        Position(F, backRank) to Rook,
+        Position(G, backRank) to King
+    )
+
+    override val pawnCharge: Position? = null
+    override val kingMoved = true
+    override val kingRookMoved = true
+    override val queenRookMoved = false
+}
+
+class QueenSideCastleOutcome(player: Player): Outcome() {
+    private val backRank = when (player) {
+        White -> ONE
+        Black -> EIGHT
+    }
+
+    override val toRemove = listOf(
+        Position(E, backRank),
+        Position(A, backRank)
+    )
+
+    override val toAdd = mapOf(
+        Position(D, backRank) to Rook,
+        Position(C, backRank) to King
+    )
+
+    override val pawnCharge: Position? = null
+    override val kingMoved = true
+    override val kingRookMoved = false
+    override val queenRookMoved = true
+}
+
+class PawnPromotionOutcome(piece: Piece, origin: Position, destination: Position): Outcome() {
+    override val toRemove = listOf(origin)
+    override val toAdd = mapOf(destination to piece)
+    override val pawnCharge: Position? = null
+    override val kingMoved = false
+    override val kingRookMoved = false
+    override val queenRookMoved = false
+}
+
+class EnPassantOutcome(origin: Position, victim: Position, destination: Position): Outcome() {
+    override val toRemove = listOf(origin, victim)
+    override val toAdd = mapOf(destination to Pawn)
+    override val pawnCharge: Position? = null
+    override val kingMoved = false
+    override val kingRookMoved = false
+    override val queenRookMoved = false
 }
 
 fun Game.state(): GameState {

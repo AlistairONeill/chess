@@ -87,6 +87,7 @@ class PawnMoveOriginFinder(
     private val position: Position,
     private val player: Player
 ) {
+    //TODO: Rework!
     private val backwardsDirection = 0 to when(player) {
         White -> -1
         Black -> 1
@@ -100,7 +101,7 @@ class PawnMoveOriginFinder(
                 oneState == null -> {
                     val twoBack = oneBack.add(backwardsDirection)
                     val twoState = board[twoBack]
-                    if (twoState != null && twoState.piece == Pawn && twoState.player == player && !twoState.hasMoved) {
+                    if (twoState != null && twoState.piece == Pawn && twoState.player == player) {
                         listOf(twoBack)
                     }
                     else {
