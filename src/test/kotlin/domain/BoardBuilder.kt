@@ -1,14 +1,8 @@
 package domain
 
-import domain.Piece.*
-
-class BoardBuilder {
+class BoardBuilder internal constructor(): Builder<Board> {
     companion object {
-        fun board(block: BoardBuilder.() -> Unit): Board {
-            val builder = BoardBuilder()
-            block(builder)
-            return builder.build()
-        }
+        val board = build(::BoardBuilder)
     }
 
     private var data = mutableMapOf<Position, PieceState>()
@@ -34,7 +28,7 @@ class BoardBuilder {
         data.putAll(builder.data)
     }
 
-    fun build() = Board(
+    override fun build() = Board(
         Rank.values().map { rank ->
             File.values().map { file ->
                 data[Position(file, rank) ]

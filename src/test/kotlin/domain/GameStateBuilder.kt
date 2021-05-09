@@ -4,13 +4,9 @@ import domain.Player.*
 import java.time.Duration
 import java.time.Instant
 
-class GameStateBuilder {
+class GameStateBuilder: Builder<GameState> {
     companion object {
-        fun gameState(block: GameStateBuilder.() -> Unit): GameState {
-            val builder = GameStateBuilder()
-            block(builder)
-            return builder.build()
-        }
+        val gameState = build(::GameStateBuilder)
     }
 
     private var board = Board.mint()
@@ -19,18 +15,14 @@ class GameStateBuilder {
 
 
     fun board(block: BoardBuilder.() -> Unit) {
-        val builder = BoardBuilder()
-        block(builder)
-        board = builder.build()
+        board = build(::BoardBuilder)(block)
     }
 
     fun flags(block: FlagsBuilder.() -> Unit) {
-        val builder = FlagsBuilder()
-        block(builder)
-        flags = builder.build()
+        flags = build(::FlagsBuilder)(block)
     }
 
-    fun build() = GameState(
+    override fun build() = GameState(
         board,
         Instant.now(),
         clock,
@@ -38,18 +30,18 @@ class GameStateBuilder {
     )
 }
 
-class FlagsBuilder {
+class FlagsBuilder: Builder<GameState.Flags> {
     var toMove = White
     var pawnCharge: Position? = null
     private var white: GameState.Flags.PlayerFlags = GameState.Flags.PlayerFlags.mint()
     private var black: GameState.Flags.PlayerFlags = GameState.Flags.PlayerFlags.mint()
 
-    class PlayerFlagsBuilder {
+    class PlayerFlagsBuilder: Builder<GameState.Flags.PlayerFlags> {
         var kingMoved = false
         var kingRookMoved = false
         var queenRookMoved = false
 
-        fun build() = GameState.Flags.PlayerFlags(
+        override fun build() = GameState.Flags.PlayerFlags(
             kingMoved,
             kingRookMoved,
             queenRookMoved
@@ -57,18 +49,14 @@ class FlagsBuilder {
     }
 
     fun white(block: PlayerFlagsBuilder.() -> Unit) {
-        val builder = PlayerFlagsBuilder()
-        block(builder)
-        white = builder.build()
+        white = build(::PlayerFlagsBuilder)(block)
     }
 
     fun black(block: PlayerFlagsBuilder.() -> Unit) {
-        val builder = PlayerFlagsBuilder()
-        block(builder)
-        black = builder.build()
+        black = build(::PlayerFlagsBuilder)(block)
     }
 
-    fun build() = GameState.Flags(
+    override fun build() = GameState.Flags(
         toMove,
         pawnCharge,
         white,
