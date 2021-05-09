@@ -6,7 +6,7 @@ import java.time.Instant
 
 class GameStateBuilder: Builder<GameState> {
     companion object {
-        val gameState = build(::GameStateBuilder)
+        val gameState = buildUsing(::GameStateBuilder)
     }
 
     private var board = Board.mint()
@@ -15,11 +15,11 @@ class GameStateBuilder: Builder<GameState> {
 
 
     fun board(block: BoardBuilder.() -> Unit) {
-        board = build(::BoardBuilder)(block)
+        board = buildUsing(::BoardBuilder)(block)
     }
 
     fun flags(block: FlagsBuilder.() -> Unit) {
-        flags = build(::FlagsBuilder)(block)
+        flags = buildUsing(::FlagsBuilder)(block)
     }
 
     override fun build() = GameState(
@@ -49,11 +49,11 @@ class FlagsBuilder: Builder<GameState.Flags> {
     }
 
     fun white(block: PlayerFlagsBuilder.() -> Unit) {
-        white = build(::PlayerFlagsBuilder)(block)
+        white = buildUsing(::PlayerFlagsBuilder)(block)
     }
 
     fun black(block: PlayerFlagsBuilder.() -> Unit) {
-        black = build(::PlayerFlagsBuilder)(block)
+        black = buildUsing(::PlayerFlagsBuilder)(block)
     }
 
     override fun build() = GameState.Flags(

@@ -2,7 +2,7 @@ package domain
 
 class BoardBuilder internal constructor(): Builder<Board> {
     companion object {
-        val board = build(::BoardBuilder)
+        val board = buildUsing(::BoardBuilder)
     }
 
     private var data = mutableMapOf<Position, PieceState>()
