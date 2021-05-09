@@ -59,8 +59,8 @@ fun Move.parse(): Intention {
     }
 
     // Check for castles
-    if (notation == "O-O".toList()) return Intention(KingSideCastle, checkStatus)
-    if (notation == "O-O-O".toList()) return Intention(QueensSideCastle, checkStatus)
+    if (notation == "O-O".toList() || notation == "0-0".toList()) return Intention(KingSideCastle, checkStatus)
+    if (notation == "O-O-O".toList() || notation == "0-0-0".toList()) return Intention(QueensSideCastle, checkStatus)
 
     val movingPiece = notation.first().asPiece() ?: Pawn
 
