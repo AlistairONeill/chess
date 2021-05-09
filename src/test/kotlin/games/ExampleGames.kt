@@ -167,10 +167,32 @@ object ExampleGames {
             }
         )
 
+    private val DeepBlueVsKasparov3 = "1.Nf3 d5 2.g3 Bg4 3.Bg2 Nd7 4.h3 Bxf3 5.Bxf3 c6 6.d3 e6 7.e4 Ne5 8.Bg2 dxe4 9.Bxe4 Nf6 10.Bg2 Bb4+ 11.Nd2 h5 12.Qe2 Qc7 13.c3 Be7 14.d4 Ng6 15.h4 e5 16.Nf3 exd4 17.Nxd4 0-0-0 18.Bg5 Ng4 19.0-0-0 Rhe8 20.Qc2 Kb8 21.Kb1 Bxg5 22.hxg5 N6e5 23.Rhe1 c5 24.Nf3 Rxd1+ 25.Rxd1 Nc4 26.Qa4 Rd8 27.Re1 Nb6 28.Qc2 Qd6 29.c4 Qg6 30.Qxg6 fxg6 31.b3 Nxf2 32.Re6 Kc7 33.Rxg6 Rd7 34.Nh4 Nc8 35.Bd5 Nd6 36.Re6 Nb5 37.cxb5 Rxd5 38.Rg6 Rd7 39.Nf5 Ne4 40.Nxg7 Rd1+ 41.Kc2 Rd2+ 42.Kc1 Rxa2 43.Nxh5 Nd2 44.Nf4 Nxb3+ 45.Kb1 Rd2 46.Re6 c4 47.Re3 Kb6 48.g6 Kxb5 49.g7 Kb4"
+        .toExampleGame(
+            board {
+                white {
+                    pawn(g, 7)
+                    pawn(g, 3)
+                    knight(f, 4)
+                    king(b, 1)
+                    rook(e, 3)
+                }
+                black {
+                    pawn(a, 7)
+                    pawn(b, 7)
+                    king(b, 4)
+                    knight(b, 3)
+                    pawn(c, 4)
+                    rook(d, 2)
+                }
+            }
+        )
+
     val allExampleGames = listOf(
         KasparovTopalov,
         DeepBlueVsKasparov1,
-        DeepBlueVsKasparov2
+        DeepBlueVsKasparov2,
+        DeepBlueVsKasparov3
     )
 
     private fun String.toExampleGame(finalBoard: Board) =
