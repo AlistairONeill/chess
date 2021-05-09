@@ -91,7 +91,9 @@ class Engine(
         val targetPieceState = gameState.board[intendedMove.destination]
 
         if (intendedMove.capture) {
-            if (targetPieceState == null) throw NotACaptureException
+            if (targetPieceState == null) {
+                return attemptEnPassantResolution(intendedMove) ?: throw NotACaptureException
+            }
             if (targetPieceState.player == gameState.toMove) throw CapturingOwnPieceException
         }
         else {
@@ -168,6 +170,53 @@ class Engine(
             .refresh()
             .remove(origin)
             .add(intendedMove.piece, intendedMove.destination)
+    }
+
+    private fun attemptEnPassantResolution(intendedMove: SimpleIntendedMove): Board? {
+        if (intendedMove.piece != Pawn) return null
+        if (!intendedMove.capture) return null
+        if (intendedMove.disambiguationRank != null) throw UnnecessaryDisambiguationException
+
+        val expectedRank = when(gameState.toMove) {
+            White -> SIX
+            Black -> THREE
+        }
+
+        if (intendedMove.destination.rank != expectedRank) return null
+        if (intendedMove.disambiguationFile == null) throw AmbiguityException(Pawn)
+
+        val originPosition = Position(
+            intendedMove.disambiguationFile,
+            when(gameState.toMove) {
+                White -> FIVE
+                Black -> FOUR
+            }
+        )
+
+        val originState = gameState.board[originPosition] ?: return null
+
+        if (originState.player != gameState.toMove) return null
+        if (originState.piece != Pawn) return null
+
+        val victimPosition = Position(
+            intendedMove.destination.file,
+            when(gameState.toMove) {
+                White -> FIVE
+                Black -> FOUR
+            }
+        )
+
+        val victimState = gameState.board[victimPosition] ?: return null
+
+        if (victimState.piece != Pawn) return null
+        if (!victimState.justMoved) return null
+        if (victimState.player == gameState.toMove) return null
+
+        return gameState.board
+            .refresh()
+            .remove(victimPosition)
+            .remove(originPosition)
+            .add(Pawn, intendedMove.destination)
     }
 
     private val opponentsBackRank = when(gameState.toMove) {
