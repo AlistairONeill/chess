@@ -3,7 +3,7 @@ package domain
 import domain.File.*
 import domain.Rank.*
 
-@Suppress("EnumEntryName")
+@Suppress("EnumEntryName", "unused")
 enum class ShorthandPosition(val position: Position) {
     a1(Position(a, ONE)),
     a2(Position(a, TWO)),

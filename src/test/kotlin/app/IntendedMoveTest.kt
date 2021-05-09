@@ -1,6 +1,5 @@
 package app
 
-import domain.*
 import games.ExampleGames
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
