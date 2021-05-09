@@ -85,7 +85,7 @@ class Engine(
             if (targetPieceState != null) throw ActuallyACaptureException
         }
 
-        val possibleOrigins = if (intendedMove.piece == Pawn) {
+        val possibleOrigins = if (intendedMove.piece == pawn) {
             if (intendedMove.capture) {
                 OriginFinder.findPawnTakeOrigin(gameState.board, intendedMove.destination, gameState.toMove)
             }
@@ -105,7 +105,7 @@ class Engine(
                 if (intendedMove.disambiguationRank != null) {
                     throw UnnecessaryDisambiguationException
                 }
-                if (intendedMove.piece != Pawn && intendedMove.disambiguationFile != null) {
+                if (intendedMove.piece != pawn && intendedMove.disambiguationFile != null) {
                     throw UnnecessaryDisambiguationException
                 }
                 possibleOrigins.first()
@@ -153,7 +153,7 @@ class Engine(
     }
 
     private fun attemptEnPassantResolution(intendedMove: SimpleIntendedMove): Outcome? {
-        if (intendedMove.piece != Pawn) return null
+        if (intendedMove.piece != pawn) return null
         if (!intendedMove.capture) return null
         if (intendedMove.disambiguationRank != null) throw UnnecessaryDisambiguationException
         if (gameState.flags.pawnCharge == null) return null
@@ -164,7 +164,7 @@ class Engine(
         }
 
         if (intendedMove.destination.rank != expectedRank) return null
-        if (intendedMove.disambiguationFile == null) throw AmbiguityException(Pawn)
+        if (intendedMove.disambiguationFile == null) throw AmbiguityException(pawn)
 
         val originRank = when(gameState.toMove) {
             White -> FIVE
@@ -179,7 +179,7 @@ class Engine(
         val originState = gameState.board[originPosition] ?: return null
 
         if (originState.player != gameState.toMove) return null
-        if (originState.piece != Pawn) return null
+        if (originState.piece != pawn) return null
 
         val victimPosition = Position(
             intendedMove.destination.file,
@@ -190,7 +190,7 @@ class Engine(
 
 
         val victimState = gameState.board[victimPosition] ?: return null
-        if (victimState.piece != Pawn) return null
+        if (victimState.piece != pawn) return null
         if (victimState.player == gameState.toMove) return null
 
         return EnPassantOutcome(originPosition, victimPosition, intendedMove.destination)
@@ -204,7 +204,7 @@ class Engine(
     private fun applyPawnPromotion(intendedMove: PawnPromotion) : Outcome {
         if (intendedMove.destination.rank != opponentsBackRank) throw PromotingNotOnBackRank
         if (intendedMove.disambiguationRank != null) throw UnnecessaryDisambiguationException
-        if (intendedMove.newPiece == Pawn || intendedMove.newPiece == King) throw CannotPromoteToException(intendedMove.newPiece)
+        if (intendedMove.newPiece == pawn || intendedMove.newPiece == king) throw CannotPromoteToException(intendedMove.newPiece)
 
         val targetPieceState = gameState.board[intendedMove.destination]
 
@@ -223,10 +223,10 @@ class Engine(
             OriginFinder.findPawnMoveOrigin(gameState.board, intendedMove.destination, gameState.toMove)
         }
 
-        if (possibleOrigins.isEmpty()) throw CouldNotFindPieceException(Pawn)
+        if (possibleOrigins.isEmpty()) throw CouldNotFindPieceException(pawn)
 
         val origin = when (possibleOrigins.size) {
-            0 -> throw CouldNotFindPieceException(Pawn)
+            0 -> throw CouldNotFindPieceException(pawn)
             1 -> {
                 if (intendedMove.disambiguationFile != null) {
                     throw UnnecessaryDisambiguationException
@@ -239,12 +239,12 @@ class Engine(
                         val slimmed = possibleOrigins.filter { it.file == intendedMove.disambiguationFile }
                         when (slimmed.size) {
                             possibleOrigins.size -> throw UnnecessaryDisambiguationException
-                            0 -> throw CouldNotFindPieceException(Pawn)
+                            0 -> throw CouldNotFindPieceException(pawn)
                             1 -> slimmed.first()
-                            else -> throw AmbiguityException(Pawn)
+                            else -> throw AmbiguityException(pawn)
                         }
                     }
-                    else -> throw AmbiguityException(Pawn)
+                    else -> throw AmbiguityException(pawn)
                 }
             }
         }
@@ -324,18 +324,18 @@ class SimpleMove(piece: Piece, origin: Position, destination: Position, player: 
     override val toRemove = listOf(origin)
     override val toAdd = mapOf(destination to piece)
     override val pawnCharge = destination.takeIf {
-        piece == Pawn
+        piece == pawn
                 && (origin.file == destination.file)
                 && ((origin.rank == TWO && destination.rank == FOUR)
                 || (origin.rank == SEVEN && destination.rank == FIVE))
     }
-    override val kingMoved = piece == King
-    override val kingRookMoved = (piece == Rook
+    override val kingMoved = piece == king
+    override val kingRookMoved = (piece == rook
             && origin == when(player) {
                 White -> Position(h, ONE)
                 Black -> Position(h, EIGHT)
             })
-    override val queenRookMoved = (piece == Rook
+    override val queenRookMoved = (piece == rook
             && origin == when(player) {
                 White -> Position(a, ONE)
                 Black -> Position(a, EIGHT)
@@ -354,8 +354,8 @@ class KingSideCastleOutcome(player: Player): Outcome() {
     )
 
     override val toAdd = mapOf(
-        Position(f, backRank) to Rook,
-        Position(g, backRank) to King
+        Position(f, backRank) to rook,
+        Position(g, backRank) to king
     )
 
     override val pawnCharge: Position? = null
@@ -376,8 +376,8 @@ class QueenSideCastleOutcome(player: Player): Outcome() {
     )
 
     override val toAdd = mapOf(
-        Position(d, backRank) to Rook,
-        Position(c, backRank) to King
+        Position(d, backRank) to rook,
+        Position(c, backRank) to king
     )
 
     override val pawnCharge: Position? = null
@@ -397,7 +397,7 @@ class PawnPromotionOutcome(piece: Piece, origin: Position, destination: Position
 
 class EnPassantOutcome(origin: Position, victim: Position, destination: Position): Outcome() {
     override val toRemove = listOf(origin, victim)
-    override val toAdd = mapOf(destination to Pawn)
+    override val toAdd = mapOf(destination to pawn)
     override val pawnCharge: Position? = null
     override val kingMoved = false
     override val kingRookMoved = false
@@ -409,5 +409,3 @@ fun Game.state(): GameState {
     stampedMoves.forEach { state = Engine.applyMove(state, it) }
     return state
 }
-
-

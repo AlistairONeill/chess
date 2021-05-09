@@ -27,6 +27,7 @@ data class Position(
     val file: File,
     val rank: Rank
 )
+
 fun Int.toRank() = Rank.values()[this - 1]
 fun File.add(i: Int) = File.values()[index + i]
 fun Rank.add(i: Int) = Rank.values()[index + i]

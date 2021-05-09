@@ -11,7 +11,7 @@ class CheckFinder(
     private val from: Player
 ) {
     companion object {
-        private val pieces = Piece.values().filter { it != Pawn }
+        private val pieces = Piece.values().filter { it != pawn }
 
         fun isInDirectCheck(board: Board, player: Player) =
             CheckFinder(board, board.findKing(player), player.other()).isInDanger()
@@ -28,7 +28,7 @@ class CheckFinder(
     private fun isInDangerFromPawn(fileOffset: Int) =
         try {
             val pieceState = board[position.add(fileOffset to dangerPawnRankOffset)]
-            pieceState != null && pieceState.piece == Pawn && pieceState.player == from
+            pieceState != null && pieceState.piece == pawn && pieceState.player == from
         }
         catch (e: ArrayIndexOutOfBoundsException) {
             false
@@ -47,7 +47,7 @@ fun Board.findKing(player: Player): Position {
         for (rank in Rank.values()) {
             val position = Position(file, rank)
             val pieceState = get(position)
-            if (pieceState != null && pieceState.piece == King && pieceState.player == player) {
+            if (pieceState != null && pieceState.piece == king && pieceState.player == player) {
                 return position
             }
         }

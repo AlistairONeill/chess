@@ -1,12 +1,13 @@
 package domain
 
+@Suppress("EnumEntryName")
 enum class Piece {
-    Pawn,
-    Rook,
-    Knight,
-    Bishop,
-    Queen,
-    King
+    pawn,
+    rook,
+    knight,
+    bishop,
+    queen,
+    king
 }
 
 data class PieceState(

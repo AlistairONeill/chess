@@ -50,12 +50,12 @@ class OriginFinder(
 
     fun find(): List<Position> =
         when (piece) {
-            Rook -> orthogonalDirections.mapNotNull(this::firstPieceInDirection)
-            Knight -> knightOffsets.mapNotNull(this::tryOffset)
-            Bishop -> diagonalDirections.mapNotNull(this::firstPieceInDirection)
-            Queen -> allDirections.mapNotNull(this::firstPieceInDirection)
-            King -> allDirections.mapNotNull(this::tryOffset)
-            Pawn -> throw Exception("SHOULD NOT BE COMING INTO HERE WITH PAWN QUERIES")
+            rook -> orthogonalDirections.mapNotNull(this::firstPieceInDirection)
+            knight -> knightOffsets.mapNotNull(this::tryOffset)
+            bishop -> diagonalDirections.mapNotNull(this::firstPieceInDirection)
+            queen -> allDirections.mapNotNull(this::firstPieceInDirection)
+            king -> allDirections.mapNotNull(this::tryOffset)
+            pawn -> throw Exception("SHOULD NOT BE COMING INTO HERE WITH PAWN QUERIES")
         }.filter {
             val pieceState = board[it]
             pieceState != null && pieceState.piece == piece && pieceState.player == player
@@ -101,14 +101,14 @@ class PawnMoveOriginFinder(
                 oneState == null -> {
                     val twoBack = oneBack.add(backwardsDirection)
                     val twoState = board[twoBack]
-                    if (twoState != null && twoState.piece == Pawn && twoState.player == player) {
+                    if (twoState != null && twoState.piece == pawn && twoState.player == player) {
                         listOf(twoBack)
                     }
                     else {
                         emptyList()
                     }
                 }
-                oneState.player == player && oneState.piece == Pawn -> listOf(oneBack)
+                oneState.player == player && oneState.piece == pawn -> listOf(oneBack)
                 else -> emptyList()
             }
         }
@@ -131,7 +131,7 @@ class PawnTakeOriginFinder(
         try {
             val consider = position.add(offset to backwardsDirection)
             val state = board[consider]
-            if (state != null && state.piece == Pawn && state.player == player) {
+            if (state != null && state.piece == pawn && state.player == player) {
                 consider
             }
             else {

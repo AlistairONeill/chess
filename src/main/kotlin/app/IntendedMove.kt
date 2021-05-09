@@ -62,9 +62,9 @@ fun Move.parse(): Intention {
     if (notation == "O-O".toList() || notation == "0-0".toList()) return Intention(KingSideCastle, checkStatus)
     if (notation == "O-O-O".toList() || notation == "0-0-0".toList()) return Intention(QueensSideCastle, checkStatus)
 
-    val movingPiece = notation.first().asPiece() ?: Pawn
+    val movingPiece = notation.first().asPiece() ?: pawn
 
-    val promotion = if (movingPiece != Pawn) {
+    val promotion = if (movingPiece != pawn) {
         notation = notation.drop(1)
         checkEmpty()
         null
@@ -143,11 +143,11 @@ fun Move.parse(): Intention {
 }
 
 private fun Char.asPiece(): Piece? = when (this) {
-    'R' -> Rook
-    'N' -> Knight
-    'B' -> Bishop
-    'K' -> King
-    'Q' -> Queen
+    'R' -> rook
+    'N' -> knight
+    'B' -> bishop
+    'K' -> king
+    'Q' -> queen
     else -> null
 }
 

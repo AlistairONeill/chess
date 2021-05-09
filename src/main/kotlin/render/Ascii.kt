@@ -15,20 +15,20 @@ fun Board.render() = Rank.values()
 
 fun PieceState.render() = when (player) {
     Player.White -> when (piece) {
-        Pawn -> "♙"
-        Rook -> "♖"
-        Knight -> "♘"
-        Bishop -> "♗"
-        Queen -> "♕"
-        King -> "♔"
+        pawn -> "♙"
+        rook -> "♖"
+        knight -> "♘"
+        bishop -> "♗"
+        queen -> "♕"
+        king -> "♔"
     }
     Player.Black -> when (piece) {
-        Pawn -> "♟"
-        Rook -> "♜"
-        Knight -> "♞"
-        Bishop -> "♝"
-        Queen -> "♛"
-        King -> "♚"
+        pawn -> "♟"
+        rook -> "♜"
+        knight -> "♞"
+        bishop -> "♝"
+        queen -> "♛"
+        king -> "♚"
     }
 }
 

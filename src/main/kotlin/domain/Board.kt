@@ -8,17 +8,17 @@ data class Board(
 ) {
     companion object {
         private fun piecesRow(player: Player) = listOf(
-            PieceState(Rook, player),
-            PieceState(Knight, player),
-            PieceState(Bishop, player),
-            PieceState(Queen, player),
-            PieceState(King, player),
-            PieceState(Bishop, player),
-            PieceState(Knight, player),
-            PieceState(Rook, player)
+            PieceState(rook, player),
+            PieceState(knight, player),
+            PieceState(bishop, player),
+            PieceState(queen, player),
+            PieceState(king, player),
+            PieceState(bishop, player),
+            PieceState(knight, player),
+            PieceState(rook, player)
         )
 
-        private fun pawnRow(player: Player) = List(8) { PieceState(Pawn, player) }
+        private fun pawnRow(player: Player) = List(8) { PieceState(pawn, player) }
 
         private fun emptyRow() = List(8) { null }
 
