@@ -57,18 +57,18 @@ class Engine(
     private fun applyKingSideCastle(): Outcome {
         if (gameState.currentPlayerFlags.kingMoved) throw InvalidCastleException("Your king has moved")
         if (gameState.currentPlayerFlags.kingSideRookMoved) throw InvalidCastleException("Your rook has moved")
-        if (isInCheck(E)) throw InvalidCastleException("You cannot castle out of check")
-        if (isInCheck(F) || isInCheck(G)) throw InvalidCastleException("You cannot castle through check")
-        if (!isEmpty(F) || !isEmpty(G)) throw InvalidCastleException("There is a piece in the way")
+        if (isInCheck(e)) throw InvalidCastleException("You cannot castle out of check")
+        if (isInCheck(f) || isInCheck(g)) throw InvalidCastleException("You cannot castle through check")
+        if (!isEmpty(f) || !isEmpty(g)) throw InvalidCastleException("There is a piece in the way")
         return KingSideCastleOutcome(gameState.toMove)
     }
 
     private fun applyQueenSideCastle(): Outcome {
         if (gameState.currentPlayerFlags.kingMoved) throw InvalidCastleException("Your king has moved")
         if (gameState.currentPlayerFlags.queenSideRookMoved) throw InvalidCastleException("Your rook has moved")
-        if (isInCheck(E)) throw InvalidCastleException("You cannot castle out of check")
-        if (isInCheck(D) || isInCheck(C)) throw InvalidCastleException("You cannot castle through check")
-        if (!isEmpty(D) || !isEmpty(C) || !isEmpty(B)) throw InvalidCastleException("There is a piece in the way")
+        if (isInCheck(e)) throw InvalidCastleException("You cannot castle out of check")
+        if (isInCheck(d) || isInCheck(c)) throw InvalidCastleException("You cannot castle through check")
+        if (!isEmpty(d) || !isEmpty(c) || !isEmpty(b)) throw InvalidCastleException("There is a piece in the way")
         return QueenSideCastleOutcome(gameState.toMove)
     }
 
@@ -332,13 +332,13 @@ class SimpleMove(piece: Piece, origin: Position, destination: Position, player: 
     override val kingMoved = piece == King
     override val kingRookMoved = (piece == Rook
             && origin == when(player) {
-                White -> Position(H, ONE)
-                Black -> Position(H, EIGHT)
+                White -> Position(h, ONE)
+                Black -> Position(h, EIGHT)
             })
     override val queenRookMoved = (piece == Rook
             && origin == when(player) {
-                White -> Position(A, ONE)
-                Black -> Position(A, EIGHT)
+                White -> Position(a, ONE)
+                Black -> Position(a, EIGHT)
             })
 }
 
@@ -349,13 +349,13 @@ class KingSideCastleOutcome(player: Player): Outcome() {
     }
 
     override val toRemove = listOf(
-        Position(E, backRank),
-        Position(H, backRank)
+        Position(e, backRank),
+        Position(h, backRank)
     )
 
     override val toAdd = mapOf(
-        Position(F, backRank) to Rook,
-        Position(G, backRank) to King
+        Position(f, backRank) to Rook,
+        Position(g, backRank) to King
     )
 
     override val pawnCharge: Position? = null
@@ -371,13 +371,13 @@ class QueenSideCastleOutcome(player: Player): Outcome() {
     }
 
     override val toRemove = listOf(
-        Position(E, backRank),
-        Position(A, backRank)
+        Position(e, backRank),
+        Position(a, backRank)
     )
 
     override val toAdd = mapOf(
-        Position(D, backRank) to Rook,
-        Position(C, backRank) to King
+        Position(d, backRank) to Rook,
+        Position(c, backRank) to King
     )
 
     override val pawnCharge: Position? = null

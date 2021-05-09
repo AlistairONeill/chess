@@ -164,14 +164,14 @@ private fun Char.asRank(): Rank? = when (this) {
 }
 
 private fun Char.asFile(): File? = when (this) {
-    'a' -> A
-    'b' -> B
-    'c' -> C
-    'd' -> D
-    'e' -> E
-    'f' -> F
-    'g' -> G
-    'h' -> H
+    'a' -> a
+    'b' -> b
+    'c' -> c
+    'd' -> d
+    'e' -> e
+    'f' -> f
+    'g' -> g
+    'h' -> h
     else -> null
 }
 

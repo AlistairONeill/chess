@@ -1,14 +1,15 @@
 package domain
 
+@Suppress("EnumEntryName")
 enum class File(val index: Int) {
-    A(0),
-    B(1),
-    C(2),
-    D(3),
-    E(4),
-    F(5),
-    G(6),
-    H(7)
+    a(0),
+    b(1),
+    c(2),
+    d(3),
+    e(4),
+    f(5),
+    g(6),
+    h(7)
 }
 
 enum class Rank(val index: Int) {
