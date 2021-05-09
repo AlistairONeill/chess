@@ -36,7 +36,9 @@ class Engine(
             board = newBoard,
             clock = newClock,
             lastMove = stampedMove.stamp,
-            toMove = gameState.toMove.other()
+            flags = gameState.flags.copy(
+                toMove = gameState.toMove.other()
+            )
         )
     }
 

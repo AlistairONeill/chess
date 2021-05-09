@@ -31,7 +31,7 @@ class RealChessApp(
         val stampedMove = move.stamp()
         val game = getGame(gameId, playerId)
         val gameState = game.state()
-        val expectedPlayerId = when (gameState.toMove) {
+        val expectedPlayerId = when (gameState.flags.toMove) {
             White -> game.white
             Black -> game.black
         }
