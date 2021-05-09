@@ -4,7 +4,7 @@ import domain.Piece.*
 
 class BoardBuilder {
     companion object {
-        fun buildBoard(block: BoardBuilder.() -> Unit): Board {
+        fun board(block: BoardBuilder.() -> Unit): Board {
             val builder = BoardBuilder()
             block(builder)
             return builder.build()
@@ -16,26 +16,26 @@ class BoardBuilder {
     class PlayerBuilder internal constructor(private val player: Player) {
         internal var data = mutableMapOf<Position, PieceState>()
 
-        fun pawn(file: File, rank: Rank) =
+        fun pawn(file: File, rank: Int) =
             add(Pawn, file, rank)
 
-        fun rook(file: File, rank: Rank) =
+        fun rook(file: File, rank: Int) =
             add(Rook, file, rank)
 
-        fun knight(file: File, rank: Rank) =
+        fun knight(file: File, rank: Int) =
             add(Knight, file, rank)
 
-        fun bishop(file: File, rank: Rank) =
+        fun bishop(file: File, rank: Int) =
             add(Bishop, file, rank)
 
-        fun queen(file: File, rank: Rank) =
+        fun queen(file: File, rank: Int) =
             add(Queen, file, rank)
 
-        fun king(file: File, rank: Rank) =
+        fun king(file: File, rank: Int) =
             add(King, file, rank)
 
-        private fun add(piece: Piece, file: File, rank: Rank) {
-            data[Position(file, rank)] = PieceState(piece, player)
+        private fun add(piece: Piece, file: File, rank: Int) {
+            data[Position(file, rank.toRank())] = PieceState(piece, player)
         }
     }
 
@@ -46,7 +46,7 @@ class BoardBuilder {
     }
 
     fun black(block: PlayerBuilder.() -> Unit) {
-        val builder = PlayerBuilder(Player.White)
+        val builder = PlayerBuilder(Player.Black)
         block(builder)
         data.putAll(builder.data)
     }

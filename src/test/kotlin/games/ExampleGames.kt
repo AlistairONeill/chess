@@ -4,6 +4,7 @@ import app.*
 import app.CheckStatus.Check
 import app.CheckStatus.None
 import domain.*
+import domain.BoardBuilder.Companion.board
 import domain.File.*
 import domain.Piece.*
 import domain.Rank.*
@@ -11,7 +12,7 @@ import domain.Rank.*
 object ExampleGames {
     data class ExampleGame(
         val moves: List<Pair<Move, Intention?>>,
-        val finalAscii: String
+        val finalBoard: Board
     )
 
     private val KasparovTopalov =
@@ -105,38 +106,65 @@ object ExampleGames {
                 "Rd2" to move(Rook, D, 2),
                 "Qa7" to move(Queen, A, 7)
             ).map { Move(it.first) to it.second },
-            "        \n" +
-                    "♕      ♟\n" +
-                    "      ♟ \n" +
-                    "     ♟  \n" +
-                    "     ♙  \n" +
-                    "  ♟   ♙ \n" +
-                    "   ♜   ♙\n" +
-                    "  ♔ ♚   "
+            board {
+                white {
+                    queen(A, 7)
+                    king(C, 1)
+                    pawn(F, 4)
+                    pawn(G, 3)
+                    pawn(H, 2)
+                }
+                black {
+                    pawn(H, 7)
+                    pawn(G, 6)
+                    pawn(F, 5)
+                    pawn(C, 3)
+                    rook(D, 2)
+                    king(E, 1)
+                }
+            }
     )
 
     private val DeepBlueVsKasparov1 = "1.e4 c5 2.c3 d5 3.exd5 Qxd5 4.d4 Nf6 5.Nf3 Bg4 6.Be2 e6 7.h3 Bh5 8.0-0 Nc6 9.Be3 cxd4 10.cxd4 Bb4 11.a3 Ba5 12.Nc3 Qd6 13.Nb5 Qe7 14.Ne5 Bxe2 15.Qxe2 0-0 16.Rac1 Rac8 17.Bg5 Bb6 18.Bxf6 gxf6 19.Nc4 Rfd8 20.Nxb6 axb6 21.Rfd1 f5 22.Qe3 Qf6 23.d5 Rxd5 24.Rxd5 exd5 25.b3 Kh8 26.Qxb6 Rg8 27.Qc5 d4 28.Nd6 f4 29.Nxb7 Ne5 30.Qd5 f3 31.g3 Nd3 32.Rc7 Re8 33.Nd6 Re1+ 34.Kh2 Nxf2 35.Nxf7+ Kg7 36.Ng5+ Kh6 37.Rxh7+"
         .toExampleGame(
-                    "        \n" +
-                    "       ♖\n" +
-                    "     ♛ ♚\n" +
-                    "   ♕  ♘ \n" +
-                    "   ♟    \n" +
-                    "♙♙   ♟♙♙\n" +
-                    "     ♞ ♔\n" +
-                    "    ♜   "
+            board {
+                white {
+                    rook(H, 7)
+                    knight(G, 5)
+                    queen(D, 5)
+                    pawn(A, 3)
+                    pawn(B, 3)
+                    pawn(G, 3)
+                    pawn(H, 3)
+                    king(H, 2)
+                }
+                black {
+                    king(H, 6)
+                    queen(F, 6)
+                    pawn(D, 4)
+                    pawn(F, 3)
+                    knight(F, 2)
+                    rook(E, 1)
+                }
+            }
         )
 
     private val DeepBlueVsKasparov2 = "1.Nf3 d5 2.d4 e6 3.g3 c5 4.Bg2 Nc6 5.0-0 Nf6 6.c4 dxc4 7.Ne5 Bd7 8.Na3 cxd4 9.Naxc4 Bc5 10.Qb3 0-0 11.Qxb7 Nxe5 12.Nxe5 Rb8 13.Qf3 Bd6 14.Nc6 Bxc6 15.Qxc6 e5 16.Rb1 Rb6 17.Qa4 Qb8 18.Bg5 Be7 19.b4 Bxb4 20.Bxf6 gxf6 21.Qd7 Qc8 22.Qxa7 Rb8 23.Qa4 Bc3 24.Rxb8 Qxb8 25.Be4 Qc7 26.Qa6 Kg7 27.Qd3 Rb8 28.Bxh7 Rb2 29.Be4 Rxa2 30.h4 Qc8 31.Qf3 Ra1 32.Rxa1 Bxa1 33.Qh5 Qh8 34.Qg4+ Kf8 35.Qc8+ Kg7 36.Qg4+ Kf8 37.Bd5 Ke7 38.Bc6 Kf8 39.Bd5 Ke7 40.Qf3 Bc3 41.Bc4 Qc8 42.Qd5 Qe6 43.Qb5 Qd7 44.Qc5+ Qd6 45.Qa7+ Qd7 46.Qa8 Qc7 47.Qa3+ Qd6 48.Qa2 f5 49.Bxf7 e4 50.Bh5 Qf6 51.Qa3+ Kd7 52.Qa7+ Kd8 53.Qb8+ Kd7 54.Be8+ Ke7 55.Bb5 Bd2 56.Qc7+ Kf8 57.Bc4 Bc3 58.Kg2 Be1 59.Kf1 Bc3 60.f4 exf3 61.exf3 Bd2 62.f4 Ke8 63.Qc8+ Ke7 64.Qc5+ Kd8 65.Bd3 Be3 66.Qxf5 Qc6 67.Qf8+ Kc7 68.Qe7+ Kc8 69.Bf5+ Kb8 70.Qd8+ Kb7 71.Qd7+ Qxd7 72.Bxd7 Kc7 73.Bb5"
         .toExampleGame(
-                    "        \n" +
-                    "  ♚     \n" +
-                    "        \n" +
-                    " ♗      \n" +
-                    "   ♟ ♙ ♙\n" +
-                    "    ♝ ♙ \n" +
-                    "        \n" +
-                    "     ♔  "
+            board {
+                white {
+                    bishop(B, 5)
+                    pawn(F, 4)
+                    pawn(G, 3)
+                    pawn(H, 4)
+                    king(F, 1)
+                }
+                black {
+                    king(C, 7)
+                    pawn(D, 4)
+                    bishop(E, 3)
+                }
+            }
         )
 
     val allExampleGames = listOf(
@@ -145,12 +173,12 @@ object ExampleGames {
         DeepBlueVsKasparov2
     )
 
-    private fun String.toExampleGame(ascii: String) =
+    private fun String.toExampleGame(finalBoard: Board) =
         ExampleGame(
             split(" ")
                 .map { it.split(".").last() }
                 .map { Move(it) to null },
-            ascii
+            finalBoard
         )
 
     private fun take(

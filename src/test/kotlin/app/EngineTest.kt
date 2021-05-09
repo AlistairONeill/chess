@@ -21,9 +21,9 @@ class EngineTest {
             }
 
             assertThat(
-                gameState.board.render(),
+                gameState.board,
                 equalTo(
-                    game.finalAscii
+                    game.finalBoard
                 )
             )
         }
